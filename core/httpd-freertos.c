@@ -675,6 +675,26 @@ void httpdPlatTimerDelete(HttpdPlatTimerHandle timer) {
 }
 #endif
 
+void httpdFreertos_set_esp_netif_t(esp_netif_t* p)
+{
+    p_esp_netif_t = p;
+}
+
+esp_netif_t * httpdFreertos_get_esp_netif_t(void)
+{
+    return p_esp_netif_t;
+    /*
+    if(NULL != p_esp_netif_t)
+    {
+        memcpy(&tmp_mirror,p_esp_netif_t,sizeof(struct esp_netif_objesp_netif_t));
+        return (esp_netif_t *) &tmp_mirror;
+    }
+    else
+    {
+        return NULL;
+    }*/
+}
+
 //Httpd initialization routine. Call this to kick off webserver functionality.
 HttpdInitStatus ICACHE_FLASH_ATTR httpdFreertosInitEx(HttpdFreertosInstance *pInstance,
     const HttpdBuiltInUrl *fixedUrls, int port,
