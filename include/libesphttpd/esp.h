@@ -31,6 +31,7 @@ typedef int32_t int32;
 #include "esp_types.h"
 #include "esp_attr.h"
 #include "esp_spi_flash.h"
+#include "esp_netif.h"
 #else
 #include <espressif/esp_common.h>
 #endif
@@ -53,4 +54,11 @@ typedef int32_t int32;
 
 #ifndef linux
 #include "espmissingincludes.h"
+#endif
+
+#ifdef ESP32
+esp_netif_t * p_esp_netif_t;
+
+void httpdFreertos_set_esp_netif_t(esp_netif_t* p);
+esp_netif_t * httpdFreertos_get_esp_netif_t(void);
 #endif

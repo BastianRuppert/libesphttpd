@@ -17,7 +17,7 @@ ESP32 Cgi/template routines for the /wifi url.
 #include <freertos/timers.h>
 #include <freertos/event_groups.h>
 
-#include <esp_event_loop.h>
+#include <esp_event.h>
 #include <esp_wifi_types.h>
 #include <esp_wifi.h>
 #include <esp_wps.h>
@@ -788,8 +788,8 @@ static void handle_config_timer(TimerHandle_t timer)
         (void) esp_wifi_disconnect();
         set_wifi_cfg(&(cfg_state.new));
 
-        if(cfg_state.new.mode == WIFI_MODE_AP || 
-          cfg_state.new.mode == WIFI_MODE_NULL || 
+        if(cfg_state.new.mode == WIFI_MODE_AP ||
+          cfg_state.new.mode == WIFI_MODE_NULL ||
           !cfg_state.new.connect){
             /* AP-only mode or not connecting, we are done. */
             cfg_state.state = cfg_state_idle;
@@ -1257,7 +1257,7 @@ CgiStatus cgiWiFiAPSettings(HttpdConnData *connData)
 CgiStatus cgiWiFiConnStatus(HttpdConnData *connData)
 {
     char buff[128];
-    tcpip_adapter_ip_info_t info;
+    esp_netif_ip_info_t info;
     esp_err_t result;
 
     if (connData->isConnectionClosed) {
@@ -1277,14 +1277,14 @@ CgiStatus cgiWiFiConnStatus(HttpdConnData *connData)
         snprintf(buff, sizeof(buff) - 1, "{\n \"status\": \"working\"\n }\n");
         break;
     case cfg_state_connected:
-        result = tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+        result = esp_netif_get_ip_info(httpdFreertos_get_esp_netif_t(), &info);//IF_STA
         if(result != ESP_OK){
             ESP_LOGE(TAG, "[%s] Error fetching IP config.", __FUNCTION__);
             goto err_out;
         }
         snprintf(buff, sizeof(buff) - 1,
-                "{\n \"status\": \"success\",\n \"ip\": \"%s\" }\n",
-                ip4addr_ntoa(&(info.ip)));
+                "{\n \"status\": \"success\",\n \"ip\": " IPSTR "}\n",
+                IP2STR(&(info.ip)));
         break;
     case cfg_state_failed:
     default:
