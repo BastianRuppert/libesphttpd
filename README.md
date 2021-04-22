@@ -1,4 +1,5 @@
 # Libesphttpd intro
+&#x1F53A; Warning: The build is currently broken for ESP8266.  This fork does not currently support ESP8266 since we don't have a maintainer who is using that chip.
 
 Libesphttpd is a HTTP server library for the ESP8266/ESP32. It supports integration in projects
 running under the non-os and FreeRTOS-based SDK. Its core is clean and small, but it provides an
