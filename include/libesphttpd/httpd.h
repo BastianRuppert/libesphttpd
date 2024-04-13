@@ -32,9 +32,19 @@ extern "C" {
 #define HTTPD_MAX_POST_LEN		2048
 #endif
 
-//Max send buffer len
+//Send buffer size
+#ifndef HTTPD_SENDBUFF_SIZE
+#define HTTPD_SENDBUFF_SIZE	2048
+#endif
+
+//Send buffer limit for httpdSend. 2 bytes are reserved for chunk termination ('\r\n').
+#ifndef HTTPD_SENDBUFF_MAX_FILL
+#define HTTPD_SENDBUFF_MAX_FILL	(HTTPD_SENDBUFF_SIZE - 2)
+#endif
+
+//Send buffer limit (for backward compatibility
 #ifndef HTTPD_MAX_SENDBUFF_LEN
-#define HTTPD_MAX_SENDBUFF_LEN	2048
+#define HTTPD_MAX_SENDBUFF_LEN HTTPD_SENDBUFF_MAX_FILL
 #endif
 
 //If some data can't be sent because the underlaying socket doesn't accept the data (like the nonos
@@ -96,7 +106,7 @@ struct HttpdPriv {
 	char corsToken[MAX_CORS_TOKEN_LEN];
 #endif
 	int headPos;
-	char sendBuff[HTTPD_MAX_SENDBUFF_LEN];
+	char sendBuff[HTTPD_SENDBUFF_SIZE];
 	int sendBuffLen;
 
 	/** NOTE: chunkHdr, if valid, points at memory assigned to sendBuff

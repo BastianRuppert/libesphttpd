@@ -222,7 +222,10 @@ void platHttpServerTaskInit(ServerTaskContext *ctx, HttpdFreertosInstance *pInst
     ctx->pInstance = pInstance;
 
 #ifdef linux
-    pthread_mutex_init(&ctx->pInstance->httpdMux, NULL);
+    pthread_mutexattr_t mutexattr;
+    pthread_mutexattr_init(&mutexattr);
+    pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&ctx->pInstance->httpdMux, &mutexattr);
 #else
     ctx->pInstance->httpdMux = xSemaphoreCreateRecursiveMutex();
 #endif
@@ -424,7 +427,7 @@ void platHttpServerTaskProcess(ServerTaskContext *ctx) {
                 ESP_LOGE(TAG, "SSL_new");
                 close(ctx->remoteFd);
                 pRconn->fd = -1;
-                continue;
+                return;
             }
             ESP_LOGD(TAG, "OK");
 
@@ -438,7 +441,7 @@ void platHttpServerTaskProcess(ServerTaskContext *ctx) {
                 close(ctx->remoteFd);
                 SSL_free(pRconn->ssl);
                 pRconn->fd = -1;
-                continue;
+                return;
             }
             ESP_LOGD(TAG, "OK");
         }
